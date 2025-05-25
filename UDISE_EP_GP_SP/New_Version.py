@@ -133,13 +133,25 @@ while True:
         ).click()
         time.sleep(2)
 
-        body = driver.find_element(By.TAG_NAME, "body")
-        body.send_keys(Keys.END)
-        time.sleep(2)
+        # body = driver.find_element(By.TAG_NAME, "body")
+        # body.send_keys(Keys.END)
+        # time.sleep(2)
 
+        # Wait for the button to be present
+        button = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//button[contains(@class, "btnsave") and contains(@class, "float-end")]'))
+        )
+
+        # Scroll to the button 7 times
+        for _ in range(7):
+            driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", button)
+            time.sleep(0.3)  # small delay to allow the scroll to complete
+
+        # Click when clickable
         WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, '//button[contains(@class, "btnsave") and contains(@class, "float-end")]'))
         ).click()
+
         time.sleep(2)
 
         WebDriverWait(driver, 10).until(

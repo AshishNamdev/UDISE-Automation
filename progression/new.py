@@ -19,9 +19,9 @@ PASSWORD = "xde75RN#"
 SECTIONS = {"A":"1", "B":"2", "C":"3", "D":"4", "E":"5", "F":"6"}
 
 # Class for which Progression is being done.
-CLASS = "9"
+CLASS = "7"
 # Section for which Progression is being done.
-SECTION = "A"
+SECTION = "B"
 
 # Setup WebDriver
 options = Options()
@@ -98,34 +98,31 @@ while restart_loop:
         # Re-find all rows dynamically in case of page change
         rows = driver.find_elements(By.XPATH, "//tbody/tr")
         
-        print(f"\n\t\tPerforming Progression for {CLASS} - {SECTION}")
         # Total number of rows
         total_rows = len(rows)
-        print(f"\n\t\tFound Student {total_rows}")
-        
+        print(f"\n\t\tPerforming Progression for {total_rows} Students of Class {CLASS} - {SECTION}")
+
         for row in rows:
             try:
-                student_name = row.find_element(By.XPATH, "./td[1]/p[1]/span[2]").get_attribute("innerHTML")
-                print(f"\n\t\tStudent Name : {student_name}")
-                student_pen = row.find_element(By.XPATH, "./td[1]/p[2]/span[2]").get_attribute("innerHTML")
-                print(f"\n\t\tStudent PEN No. : {student_pen}")
-                
+                student_name = row.find_element(By.XPATH, "./td[1]/p[1]/span[2]").get_attribute("innerHTML").strip()
+                student_pen = row.find_element(By.XPATH, "./td[1]/p[2]/span[2]").get_attribute("innerHTML").strip()
+
                 # Progression Status
                 Select(row.find_element(By.XPATH, ".//td[2]/ul/li[1]/select")).select_by_index(1)
 
                 time.sleep(0.1)
-                # Generate a random number between 70 and 90 for Marks in %
-                random_number = random.randint(70, 90)
+                # Generate a random number between 55 and 85 for Marks in %
+                percentage_marks = random.randint(55, 85)
                 input_field = row.find_element(By.XPATH, ".//td[2]/ul/li[2]/input")
                 input_field.clear()
-                input_field.send_keys(str(random_number))
+                input_field.send_keys(str(percentage_marks))
 
                 time.sleep(0.1)
-                # Generate a random number between 200 and 230 for No. of Days School attended
-                random_number = random.randint(200, 230)
+                # Generate a random number between 190 and 225 for No. of Days School attended
+                days_school_attend = random.randint(200, 230)
                 input_field = row.find_element(By.XPATH, ".//td[2]/ul/li[3]/input")
                 input_field.clear()
-                input_field.send_keys(str(random_number))
+                input_field.send_keys(str(days_school_attend))
                 time.sleep(0.1)
 
                 time.sleep(0.1)
@@ -148,6 +145,7 @@ while restart_loop:
                 #WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[4]/div/div[6]/button[1]"))).click()
                 #time.sleep(1)
 
+                print(f"\n\t\tStudent Name: {student_name}, Student PEN No.: {student_pen}, Marks in Percentage (%): {percentage_marks}, No. of Days School attended: {days_school_attend}")
                 # Increment the row counter
                 row_count += 1
 

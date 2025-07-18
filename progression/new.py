@@ -19,9 +19,11 @@ PASSWORD = "xde75RN#"
 SECTIONS = {"A":"1", "B":"2", "C":"3", "D":"4", "E":"5", "F":"6"}
 
 # Class for which Progression is being done.
-CLASS = "7"
+CLASS = "10"
 # Section for which Progression is being done.
-SECTION = "B"
+SECTION = "C"
+# New Section to promote student
+NEW_SECTION = "C"
 
 # Setup WebDriver
 options = Options()
@@ -53,11 +55,11 @@ ac_year = WebDriverWait(driver, 15).until(
     EC.presence_of_element_located((By.XPATH, "//ul/li/div/div[2]/p"))
 )
 ac_year.click()
-time.sleep(5)
+#time.sleep(5)
 
 # Close the School Information pop up.
 WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, "//div/div/div/div[3]/button"))).click()
-time.sleep(5)
+time.sleep(1)
 
 # Select Student Movement and Progression option
 driver.find_element(By.XPATH, "//ul/li[8]/div/div/h2/button").click()
@@ -65,19 +67,19 @@ time.sleep(5)
 
 # Select  Progression Activity from the list
 driver.find_element(By.XPATH, "//ul/li[8]/div/div/div/div/ul/li[1]/span").click()
-time.sleep(10)
+time.sleep(5)
 
 # Go to Progression Module
 driver.find_element(By.XPATH, '//*[@id="page-content-wrapper"]/main/div/div/div/app-module-choice/div/div/div[1]/div/a').click()
-time.sleep(5)
+time.sleep(1)
 
 # Select Class for Progression
 Select(driver.find_element(By.XPATH, "//ul/li[1]/select")).select_by_value(CLASS)
-time.sleep(1)
+#time.sleep(0.1)
 
 # Select Section for Progression
 Select(driver.find_element(By.XPATH, "//ul/li[2]/select")).select_by_value(SECTIONS[SECTION])
-time.sleep(1)
+#time.sleep(0.1)
 
 # Go to Student List for Progression of selected class and section
 driver.find_element(By.XPATH, "//ul/li[3]/button").click()
@@ -88,6 +90,7 @@ time.sleep(5)
 # Setup WebDriver (as you have already done)
 # [...]
 
+progression_done = 0
 row_count = 0
 restart_loop = True
 
@@ -104,9 +107,15 @@ while restart_loop:
 
         for row in rows:
             try:
+                student_status = row.find_element(By.XPATH, "./td[4]/span").get_attribute("innerHTML").strip()
                 student_name = row.find_element(By.XPATH, "./td[1]/p[1]/span[2]").get_attribute("innerHTML").strip()
                 student_pen = row.find_element(By.XPATH, "./td[1]/p[2]/span[2]").get_attribute("innerHTML").strip()
 
+                # Skip if Progression is done for the student.
+                if student_status.lower() == "done":
+                    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
+                    print(f"\n\tProgression already done for {student_name}, {student_pen}")
+                    continue
                 # Progression Status
                 Select(row.find_element(By.XPATH, ".//td[2]/ul/li[1]/select")).select_by_index(1)
 
@@ -123,7 +132,6 @@ while restart_loop:
                 input_field = row.find_element(By.XPATH, ".//td[2]/ul/li[3]/input")
                 input_field.clear()
                 input_field.send_keys(str(days_school_attend))
-                time.sleep(0.1)
 
                 time.sleep(0.1)
                 # Schooling Status
@@ -131,7 +139,7 @@ while restart_loop:
                 
                 time.sleep(0.1)
                 # Section status
-                Select(row.find_element(By.XPATH, "./td[3]/ul[2]/li[2]/select")).select_by_value(SECTIONS[SECTION])
+                Select(row.find_element(By.XPATH, "./td[3]/ul[2]/li[2]/select")).select_by_value(SECTIONS[NEW_SECTION])
 
                 # Click Update
                 row.find_element(By.XPATH, ".//td[6]/button[1]").click()
@@ -148,6 +156,7 @@ while restart_loop:
                 print(f"\n\t\tStudent Name: {student_name}, Student PEN No.: {student_pen}, Marks in Percentage (%): {percentage_marks}, No. of Days School attended: {days_school_attend}")
                 # Increment the row counter
                 row_count += 1
+                progression_done += 1
 
                 # Pause for 10 seconds after every 100 rows
                 if row_count > 0 and row_count % 100 == 0:
@@ -188,3 +197,4 @@ while restart_loop:
         break  # Exit the while loop if a major error occurs
 
 print("Script completed.")
+print(f"\n\t\tCompleted Progression for {progression_done} Students of Class {CLASS} - {SECTION}")
